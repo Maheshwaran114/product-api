@@ -1,0 +1,152 @@
+openapi: 3.0.0
+info:
+  title: Product API
+  version: 1.0.0
+  description: API for fetching and storing products from Amazon UK
+
+servers:
+  - url: http://localhost:3000
+    description: Development server
+
+paths:
+  /health:
+    get:
+      summary: Health check endpoint
+      description: Returns the health status of the API
+      responses:
+        '200':
+          description: API is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: "ok"
+
+  /api/amazon/search:
+    get:
+      summary: Search products on Amazon UK
+      description: Searches for products on Amazon UK and stores them in the database
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: Search keyword
+      responses:
+        '200':
+          description: List of products found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Product'
+        '400':
+          description: Bad request - missing query parameter
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+components:
+  schemas:
+    Product:
+      type: object
+      properties:
+        source:
+          type: string
+          example: "Amazon UK"
+        external_id:
+          type: string
+          example: "B08X12345"
+        title:
+          type: string
+          example: "Apple MacBook Pro 16-inch"
+        description:
+          type: string
+        brand:
+          type: string
+          example: "Apple"
+        manufacturer:
+          type: string
+          example: "Apple Inc."
+        category:
+          type: string
+          example: "Laptops"
+        sub_category:
+          type: string
+          example: "Electronics"
+        price:
+          type: number
+          format: float
+          example: 2399.00
+        list_price:
+          type: number
+          format: float
+          example: 2499.00
+        price_saved:
+          type: number
+          format: float
+          example: 100.00
+        discount_percentage:
+          type: integer
+          example: 4
+        currency:
+          type: string
+          example: "GBP"
+        product_url:
+          type: string
+          format: uri
+          example: "https://www.amazon.co.uk/dp/B08X12345"
+        features:
+          type: array
+          items:
+            type: string
+          example: ["Apple M1 Pro chip", "Up to 17 hours of battery life"]
+        availability:
+          type: string
+          example: "In stock"
+        is_prime:
+          type: boolean
+          example: true
+        image_url:
+          type: string
+          format: uri
+          example: "https://m.media-amazon.com/images/I/61aUBxqc5PL._AC_SL320_.jpg"
+        rating:
+          type: number
+          format: float
+          example: 4.8
+        total_reviews:
+          type: integer
+          example: 1245
+      required:
+        - source
+        - external_id
+        - title
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: "An error occurred while fetching products from Amazon UK"
+        path:
+          type: string
+          example: "/api/amazon/search"
+        timestamp:
+          type: string
+          format: date-time
+          example: "2023-01-01T12:00:00Z"
+      required:
+        - error

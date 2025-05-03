@@ -1,9 +1,21 @@
 const express = require('express');
-const AmazonController = require('../controllers/amazonController');
-
+const amazonController = require('../controllers/amazonController');
 const router = express.Router();
-const amazonController = new AmazonController();
 
-router.get('/search', amazonController.search.bind(amazonController));
+/**
+ * @route   GET /api/amazon/search
+ * @desc    Search Amazon products by keyword
+ * @query   {string} keyword - Search keyword
+ * @query   {string} country - Country code (e.g. 'UK', 'US')
+ * @access  Public
+ */
+router.get('/search', amazonController.searchProducts);
+
+/**
+ * @route   GET /api/amazon/countries
+ * @desc    Get available Amazon country services
+ * @access  Public
+ */
+router.get('/countries', amazonController.getAvailableCountries);
 
 module.exports = router;

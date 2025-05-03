@@ -1,0 +1,61 @@
+config:
+  target: "http://localhost:3000"
+  phases:
+    - duration: 60
+      arrivalRate: 5
+      name: "Warm up"
+    - duration: 120
+      arrivalRate: 10
+      rampTo: 30
+      name: "Ramp up load"
+    - duration: 60
+      arrivalRate: 30
+      name: "Sustained load"
+  
+  # Define default headers for all requests
+  defaults:
+    headers:
+      Accept: "application/json"
+      Content-Type: "application/json"
+
+scenarios:
+  # Test the health endpoint to verify API availability
+  - name: "Health check"
+    weight: 10
+    flow:
+      - get:
+          url: "/health"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
+            - equals:
+                - "$.status"
+                - "ok"
+
+  # Test the Amazon search endpoint with various keywords
+  - name: "Search for laptops"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/amazon/search?q=laptop"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
+
+  - name: "Search for smartphones"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/amazon/search?q=smartphone"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
+
+  - name: "Search for headphones"
+    weight: 30
+    flow:
+      - get:
+          url: "/api/amazon/search?q=headphones"
+          expect:
+            - statusCode: 200
+            - contentType: "application/json"
